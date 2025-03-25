@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Форма Prompt</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h2 th:text="${prompt.id} ? 'Редактирование Промпта' : 'Создание Промпта'"></h2>
+    <form th:action="${prompt.id} ? @{/prompts/update/{id}(id=${prompt.id})} : @{/prompts}" method="post" th:object="${prompt}">
+        <input type="hidden" th:field="*{id}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Название</label>
+            <input type="text" id="name" class="form-control" th:field="*{name}" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Описание</label>
+            <textarea id="description" class="form-control" th:field="*{description}"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">Контент</label>
+            <textarea id="content" class="form-control" th:field="*{content}" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="promptType" class="form-label">Тип промпта</label>
+            <select id="promptType" class="form-select" th:field="*{promptType}" required>
+                <option th:each="type : ${promptTypes}"
+                        th:value="${type.name}"
+                        th:text="${type.description}">
+                </option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="lastChangedBy" class="form-label">Автор изменений</label>
+            <input type="text" id="lastChangedBy" class="form-control" th:field="*{lastChangedBy}" required>
+        </div>
+        <button type="submit" class="btn btn-success">Сохранить</button>
+        <a href="/prompts" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+</body>
+</html>

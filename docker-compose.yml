@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  assistant-ai:
+    image: ghcr.io/valykhin/assistant-ai:0.0.1-SNAPSHOT
+    container_name: assistant-ai
+    restart: always
+    ports:
+      - "80:8080"
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      BOT_NAME: ${BOT_NAME:-secret}
+      BOT_TOKEN: ${BOT_TOKEN}
+      DEFAULT_USERNAME: ${DEFAULT_USERNAME}
+      DEFAULT_PASSWORD: ${DEFAULT_PASSWORD}
+      LOGGING_LEVEL_RU_IVALYKHIN_ASSISTANT_AI: INFO
+    depends_on:
+      - postgres
+
+  postgres:
+    restart: always
+    image: postgres:15.0
+    environment:
+      - POSTGRES_USER=${SPRING_DATASOURCE_USERNAME}
+      - POSTGRES_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - POSTGRES_DB=assistant
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres:

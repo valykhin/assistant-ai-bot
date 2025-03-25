@@ -1,0 +1,211 @@
+databaseChangeLog:
+- changeSet:
+    id: 1742812850936-1
+    author: ivalykhin (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: prompts_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: content
+            type: TEXT
+        - column:
+            constraints:
+              nullable: false
+            name: created_at
+            type: TIMESTAMP WITH TIME ZONE
+        - column:
+            name: description
+            type: TEXT
+        - column:
+            constraints:
+              nullable: false
+            name: last_changed_by
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: name
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: updated_at
+            type: TIMESTAMP WITH TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: prompt_type
+            type: VARCHAR(64)
+        tableName: prompts
+- changeSet:
+    id: 1742812850936-2
+    author: ivalykhin (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: surveys_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: content
+            type: TEXT
+        - column:
+            constraints:
+              nullable: false
+            name: created_at
+            type: TIMESTAMP WITH TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: last_changed_by
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: name
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: schedule
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: updated_at
+            type: TIMESTAMP WITH TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: prompt_id
+            type: BIGINT
+        tableName: surveys
+- changeSet:
+    id: 1742812850936-3
+    author: ivalykhin (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: name
+        constraintName: prompts_name_unique_constraint
+        tableName: prompts
+- changeSet:
+    id: 1742812850936-4
+    author: ivalykhin (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: name
+        constraintName: surveys_name_unique_constraint
+        tableName: surveys
+- changeSet:
+    id: 1742812850936-5
+    author: ivalykhin (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: prompt_type_pkey
+            name: name
+            type: VARCHAR(64)
+        - column:
+            constraints:
+              nullable: false
+            name: created_at
+            type: TIMESTAMP WITH TIME ZONE
+        - column:
+            name: description
+            type: VARCHAR(256)
+        - column:
+            constraints:
+              nullable: false
+            name: updated_at
+            type: TIMESTAMP WITH TIME ZONE
+        tableName: prompt_type
+- changeSet:
+    id: 1742812850936-6
+    author: ivalykhin (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: users_pkey
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: created_at
+            type: TIMESTAMP WITH TIME ZONE
+        - column:
+            name: last_ai_response_id
+            type: VARCHAR(128)
+        - column:
+            constraints:
+              nullable: false
+            name: updated_at
+            type: TIMESTAMP WITH TIME ZONE
+        tableName: users
+- changeSet:
+    id: 1742812850936-7
+    author: ivalykhin (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: prompt_type
+        baseTableName: prompts
+        constraintName: prompts_prompt_type_foreign_key
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: name
+        referencedTableName: prompt_type
+        validate: true
+- changeSet:
+    id: 1742812850936-8
+    author: ivalykhin (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: prompt_id
+        baseTableName: surveys
+        constraintName: surveys_prompt_id_foreign_key
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: id
+        referencedTableName: prompts
+        validate: true
+- changeSet:
+      id: add-criteria-for-prompt-type
+      author: ivalykhin
+      changes:
+        - addColumn:
+            tableName: prompt_type
+            columns:
+              - column:
+                  name: criteria
+                  type: VARCHAR(512)
+
+

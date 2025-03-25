@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: assistant-ai
+  jpa:
+    properties:
+      hibernate:
+        hbm2ddl.auto: update
+  datasource:
+    url: jdbc:h2:mem:test;DB_CLOSE_ON_EXIT=FALSE
+    username: "admin"
+    password: ""
+  liquibase:
+    enabled: false
+
+default:
+  username: test
+  password: test
+
+logging:
+  level:
+    ru.ivalykhin.assistant_ai: INFO
+    org.springframework.security: DEBUG
+
+bot:
+  name: ai_assist_test_bot
+  token: test
+
+
+openai:
+  api-key: test
+  model: gpt-4o-mini
+  default-prompt: Ты — Эйва

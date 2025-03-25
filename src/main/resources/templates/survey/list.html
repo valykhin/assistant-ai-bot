@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Список Опросов</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <a href="/" class="btn btn-primary">На главную</a>
+    <h2>Список Опросов</h2>
+    <a href="/surveys/create" class="btn btn-primary mb-3">Создать новый Опрос</a>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Промпт</th>
+            <th>Контент</th>
+            <th>Расписание</th>
+            <th>Автор изменений</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="survey : ${surveys}">
+            <td th:text="${survey.id}"></td>
+            <td th:text="${survey.name}"></td>
+            <td th:text="${survey.prompt.name}"></td>
+            <td th:text="${survey.content}"></td>
+            <td th:text="${survey.schedule}"></td>
+            <td th:text="${survey.lastChangedBy}"></td>
+            <td>
+                <a th:href="@{/surveys/edit/{id}(id=${survey.id})}" class="btn btn-warning btn-sm">Редактировать</a>
+                <a th:href="@{/surveys/delete/{id}(id=${survey.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Вы уверены?');">Удалить</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

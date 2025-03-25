@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Форма Survey</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h2 th:text="${survey.id} ? 'Редактирование Опроса' : 'Создание Опроса'"></h2>
+    <form th:action="${survey.id} ? @{/surveys/update/{id}(id=${survey.id})} : @{/surveys}" method="post" th:object="${survey}">
+        <input type="hidden" th:field="*{id}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Название</label>
+            <input type="text" id="name" class="form-control" th:field="*{name}" required>
+        </div>
+        <div class="mb-3">
+            <label for="promptId" class="form-label">Промпт</label>
+            <select id="promptId" class="form-select" th:field="*{prompt.name}" required>
+                <option th:each="prompt : ${prompts}" th:value="${prompt.id}" th:text="${prompt.name}"></option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">Контент</label>
+            <textarea id="content" class="form-control" th:field="*{content}" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="schedule" class="form-label">Расписание</label>
+            <input type="text" id="schedule" class="form-control" th:field="*{schedule}" required>
+        </div>
+        <div class="mb-3">
+            <label for="lastChangedBy" class="form-label">Автор изменений</label>
+            <input type="text" id="lastChangedBy" class="form-control" th:field="*{lastChangedBy}" required>
+        </div>
+        <button type="submit" class="btn btn-success">Сохранить</button>
+        <a href="/surveys" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+</body>
+</html>
