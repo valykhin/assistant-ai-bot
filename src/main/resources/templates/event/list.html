@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head th:replace="common/layout :: head"></head>
+<body>
+    <div th:replace="common/layout :: header"></div>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a href="/" class="btn btn-primary mb-3">На главную</a>
+            <a href="/events/create" class="btn btn-success mb-3">Создать новое событие</a>
+        </div>
+        <h2 class="mb-3">Список Событий</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Промпт</th>
+                    <th>Контент</th>
+                    <th>Расписание</th>
+                    <th>Автор изменений</th>
+                    <th>Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="event : ${events}">
+                    <td th:text="${event.id}"></td>
+                    <td th:text="${event.name}"></td>
+                    <td th:text="${event.prompt.name}"></td>
+                    <td th:text="${event.content}"></td>
+                    <td th:text="${event.schedule}"></td>
+                    <td th:text="${event.lastChangedBy}"></td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a th:href="@{/events/edit/{id}(id=${event.id})}" class="btn btn-warning btn-sm">Редактировать</a>
+                            <a th:href="@{/events/delete/{id}(id=${event.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Вы уверены?');">Удалить</a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

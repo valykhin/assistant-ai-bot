@@ -4,36 +4,41 @@
 <body>
     <div th:replace="common/layout :: header"></div>
     <div class="container mt-4">
-        <h2 th:text="${prompt.id} ? 'Редактирование Промпта' : 'Создание Промпта'"></h2>
-        <form th:action="${prompt.id} ? @{/prompts/update/{id}(id=${prompt.id})} : @{/prompts}" method="post" th:object="${prompt}">
+        <h2 th:text="${event.id} ? 'Редактирование Опроса' : 'Создание Опроса'"></h2>
+        <form th:action="${event.id} ? @{/events/update/{id}(id=${event.id})} : @{/events}" method="post" th:object="${event}">
             <input type="hidden" th:field="*{id}">
+
             <div class="mb-3">
                 <label for="name" class="form-label">Название</label>
                 <input type="text" id="name" class="form-control" th:field="*{name}" required>
             </div>
+
             <div class="mb-3">
-                <label for="description" class="form-label">Описание</label>
-                <textarea id="description" class="form-control" th:field="*{description}"></textarea>
+                <label for="promptId" class="form-label">Промпт</label>
+                <select id="promptId" class="form-select" th:field="*{prompt.name}" required>
+                    <option th:each="prompt : ${prompts}" th:value="${prompt.id}" th:text="${prompt.name}"></option>
+                </select>
             </div>
+
             <div class="mb-3">
                 <label for="content" class="form-label">Контент</label>
                 <textarea id="content" class="form-control" th:field="*{content}" required></textarea>
             </div>
+
             <div class="mb-3">
-                <label for="promptType" class="form-label">Тип промпта</label>
-                <select id="promptType" class="form-select" th:field="*{promptType}" required>
-                    <option th:each="type : ${promptTypes}"
-                            th:value="${type.name}"
-                            th:text="${type.description}">
-                    </option>
-                </select>
+                <label for="schedule" class="form-label">Расписание</label>
+                <input type="text" id="schedule" class="form-control" th:field="*{schedule}" required>
             </div>
+
             <div class="mb-3">
                 <label for="lastChangedBy" class="form-label">Автор изменений</label>
                 <input type="text" id="lastChangedBy" class="form-control" th:field="*{lastChangedBy}" required>
             </div>
-            <button type="submit" class="btn btn-success">Сохранить</button>
-            <a href="/prompts" class="btn btn-secondary">Отмена</a>
+
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-success">Сохранить</button>
+                <a href="/events" class="btn btn-secondary">Отмена</a>
+            </div>
         </form>
     </div>
 </body>

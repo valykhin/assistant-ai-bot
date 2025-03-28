@@ -16,7 +16,7 @@ import java.time.OffsetDateTime;
 @Data
 @Builder
 @Entity
-@Table(name = "prompt_type")
+@Table(name = "prompt_types")
 @NoArgsConstructor
 @AllArgsConstructor
 public class PromptType {

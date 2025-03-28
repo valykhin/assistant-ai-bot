@@ -122,6 +122,7 @@ tasks.register<DockerBuildImage>("dockerBuild") {
 	inputDir.set(file("."))
 	images.add(dockerImageName)
 	buildArgs.put("BUILD_IMAGE", "eclipse-temurin:17.0.11_9-jdk-centos7")
+	platform.set("linux/amd64")
 }
 
 tasks.register<DockerPushImage>("dockerPush") {
