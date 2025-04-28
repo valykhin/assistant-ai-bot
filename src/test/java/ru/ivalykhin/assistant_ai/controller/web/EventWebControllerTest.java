@@ -6,11 +6,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.ivalykhin.assistant_ai.model.Prompt;
 import ru.ivalykhin.assistant_ai.model.Event;
-import ru.ivalykhin.assistant_ai.service.PromptService;
+import ru.ivalykhin.assistant_ai.model.Periodicity;
+import ru.ivalykhin.assistant_ai.model.Prompt;
+import ru.ivalykhin.assistant_ai.model.ScheduleConfig;
 import ru.ivalykhin.assistant_ai.service.EventService;
+import ru.ivalykhin.assistant_ai.service.PromptService;
+import ru.ivalykhin.assistant_ai.service.UserService;
 
+import java.time.OffsetTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +33,8 @@ public class EventWebControllerTest {
     private PromptService promptService;
     @MockitoBean
     private EventService eventService;
+    @MockitoBean
+    private UserService userService;
 
     @Test
     @WithMockUser(username = "user", roles = "USER")
@@ -60,14 +67,24 @@ public class EventWebControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
     public void requestEventCreationByAdminWithCsrf_success() throws Exception {
+        ScheduleConfig scheduleConfig = ScheduleConfig.builder()
+                .periodicity(Periodicity.DAILY)
+                .time(OffsetTime.now())
+                .build();
         Event event = Event.builder()
                 .name("Test event")
                 .lastChangedBy("admin")
                 .prompt(Prompt.builder().id(1L).build())
+                .schedule(scheduleConfig)
                 .build();
 
         mockMvc.perform(post("/events")
                         .flashAttr("event", event)
+                        .param("schedule.periodicity",
+                                scheduleConfig.getPeriodicity().toString())
+                        .param("schedule.time",
+                                scheduleConfig.getTime()
+                                        .format(DateTimeFormatter.ofPattern("HH:mm:ssXXX")))
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/events"));

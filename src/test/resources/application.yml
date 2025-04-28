@@ -25,6 +25,8 @@ bot:
   name: ai_assist_test_bot
   token: test
 
+scheduler:
+  cron: "0 */10 * * * ?"
 
 openai:
   api-key: test
