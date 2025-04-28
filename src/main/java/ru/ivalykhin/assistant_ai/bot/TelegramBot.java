@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.ivalykhin.assistant_ai.model.User;
@@ -47,35 +48,23 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        log.debug(String.format("Received update: %s", update));
+        log.info(String.format("Received update: %s", update));
         if (update.hasMessage() && update.getMessage().hasText()) {
-            String message = update.getMessage().getText();
-            log.info(String.format("Received from user %s message: %s",
-                    update.getMessage().getFrom().getId(),
-                    message));
 
-            String chatId = update.getMessage().getChatId().toString();
-
-            User user = userService.registerUser(
-                    update.getMessage().getFrom().getId(),
-                    update.getMessage().getFrom().getUserName(),
-                    update.getMessage().getFrom().getFirstName(),
-                    update.getMessage().getFrom().getLastName());
-
-            if (message.startsWith("/")) {
-                sendMessage(commandsHandler.handleCommands(update));
-            } else {
-                List<String> responseList = userMessageHandler.sendMessageToAI(
-                        message,
-                        user
-                );
-                responseList.forEach(response -> sendMessage(new SendMessage(chatId, response)));
+            if (this.isUserMessageForBot(update.getMessage())) {
+                handleUserMessage(update);
             }
 
         } else if (update.hasCallbackQuery()) {
             log.info(String.format("Received callback query message: %s",
                     update.getCallbackQuery().toString()));
             sendMessage(callbacksHandler.handleCallbacks(update));
+        } else if (update.hasChannelPost()) {
+            String channelName = update.getChannelPost().getChat().getTitle();
+            Long channelId = update.getChannelPost().getChatId();
+            String messageText = update.getChannelPost().getText();
+
+            log.info("Received channel message: " + channelName + " [" + channelId + "]: " + messageText);
         }
     }
 
@@ -85,6 +74,54 @@ public class TelegramBot extends TelegramLongPollingBot {
             execute(sendMessage);
         } catch (TelegramApiException e) {
             log.error(e.getMessage());
+        }
+    }
+
+    private Boolean isUserMessageForBot(Message message) {
+        log.info("@" + getBotUsername());
+        return "private".equals(message.getChat().getType())
+                || ("supergroup".equals(message.getChat().getType())
+                    && message.getText().contains("@" + getBotUsername()));
+    }
+
+    private void handleUserMessage(Update update) {
+        Message message = update.getMessage();
+        String messageText = message.getText();
+        log.info(String.format("Received from user %s message: %s",
+                message.getFrom().getId(),
+                messageText));
+
+        String chatId = message.getChatId().toString();
+
+        User user = userService.registerUser(
+                message.getFrom().getId(),
+                message.getFrom().getUserName(),
+                message.getFrom().getFirstName(),
+                message.getFrom().getLastName());
+
+        if (messageText.startsWith("/")) {
+            sendMessage(commandsHandler.handleCommands(update));
+        } else {
+            if (message.getReplyToMessage() != null) {
+                Message replyToMessage = message.getReplyToMessage();
+                messageText = String.format("@%s\n%s\n%s",
+                        replyToMessage.getFrom().getUserName(),
+                        replyToMessage.getText(),
+                        messageText);
+            }
+            List<String> responseList = userMessageHandler.sendMessageToAI(
+                    messageText,
+                    user
+            );
+
+            String response = String.join("\n", responseList);
+            SendMessage newMessage = new SendMessage(chatId, response);
+
+            if ("supergroup".equals(message.getChat().getType())) {
+                newMessage.setReplyToMessageId(message.getMessageId());
+            }
+
+            sendMessage(newMessage);
         }
     }
 }
