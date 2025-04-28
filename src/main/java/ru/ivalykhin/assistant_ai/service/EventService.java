@@ -13,4 +13,8 @@ public interface EventService {
     Event saveEvent(Event event);
 
     void deleteEvent(Long id);
+
+    List<Event> getReadyToExecuteEvents();
+
+    void executeEvent(Event event);
 }

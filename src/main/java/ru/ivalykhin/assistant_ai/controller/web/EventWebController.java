@@ -1,19 +1,26 @@
 package ru.ivalykhin.assistant_ai.controller.web;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.ivalykhin.assistant_ai.model.Event;
-import ru.ivalykhin.assistant_ai.service.PromptService;
+import ru.ivalykhin.assistant_ai.model.ScheduleConfig;
 import ru.ivalykhin.assistant_ai.service.EventService;
+import ru.ivalykhin.assistant_ai.service.PromptService;
+import ru.ivalykhin.assistant_ai.service.UserService;
 
+import java.time.OffsetTime;
+
+@Slf4j
 @Controller
 @RequestMapping("/events")
 @RequiredArgsConstructor
 public class EventWebController {
     private final EventService eventService;
     private final PromptService promptService;
+    private final UserService userService;
 
     @GetMapping
     public String listEvents(Model model) {
@@ -23,13 +30,27 @@ public class EventWebController {
 
     @GetMapping("/create")
     public String showCreateForm(Model model) {
-        model.addAttribute("event", new Event());
+        Event event = new Event();
+        event.setLastChangedBy(userService.getCurrentAdminUsername());
+        event.setSchedule(ScheduleConfig.builder().time(OffsetTime.now()).build());
+
+        model.addAttribute("event", event);
         model.addAttribute("prompts", promptService.getAllPrompts());
         return "event/form";
     }
 
     @PostMapping
-    public String createEvent(@ModelAttribute Event event) {
+    public String createEvent(@ModelAttribute Event event,
+                              @RequestParam("schedule.periodicity") String periodicity,
+                              @RequestParam("schedule.time") String time,
+                              @RequestParam(value = "schedule.juniorUnits", required = false) String juniorUnits,
+                              @RequestParam(value = "schedule.offset", required = false) String offset,
+                              @RequestParam(value = "schedule.exceptDates", required = false) String exceptDates
+    ) {
+        ScheduleConfig schedule = ScheduleConfig.fromFormParams(periodicity, time, juniorUnits, offset, exceptDates);
+        event.setSchedule(schedule);
+        log.info(event.toString());
+
         eventService.saveEvent(event);
         return "redirect:/events";
     }

@@ -23,6 +23,9 @@ bot:
   name: ${BOT_NAME}
   token: ${BOT_TOKEN}
 
+scheduler:
+  cron: "0 */10 * * * ?"
+
 openai:
   api-key: ${OPENAI_API_KEY}
   model: ${OPENAI_MODEL}

@@ -9,7 +9,9 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.ivalykhin.assistant_ai.model.User;
 import ru.ivalykhin.assistant_ai.service.UserMessageHandler;
+import ru.ivalykhin.assistant_ai.service.UserService;
 
 import java.util.List;
 
@@ -20,6 +22,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final CommandsHandler commandsHandler;
     private final CallbacksHandler callbacksHandler;
     private final UserMessageHandler userMessageHandler;
+    private final UserService userService;
 
     private final String botUsername;
 
@@ -28,8 +31,10 @@ public class TelegramBot extends TelegramLongPollingBot {
                        @Value("${bot.token}") String botToken,
                        CommandsHandler commandsHandler,
                        CallbacksHandler callbacksHandler,
-                       UserMessageHandler userMessageHandler) throws TelegramApiException {
+                       UserMessageHandler userMessageHandler,
+                       UserService userService) throws TelegramApiException {
         super(botToken);
+        this.userService = userService;
         log.info("Creating telegram long polling component");
         this.botUsername = botUsername;
 
@@ -51,12 +56,18 @@ public class TelegramBot extends TelegramLongPollingBot {
 
             String chatId = update.getMessage().getChatId().toString();
 
+            User user = userService.registerUser(
+                    update.getMessage().getFrom().getId(),
+                    update.getMessage().getFrom().getUserName(),
+                    update.getMessage().getFrom().getFirstName(),
+                    update.getMessage().getFrom().getLastName());
+
             if (message.startsWith("/")) {
                 sendMessage(commandsHandler.handleCommands(update));
             } else {
                 List<String> responseList = userMessageHandler.sendMessageToAI(
                         message,
-                        update.getMessage().getFrom().getId()
+                        user
                 );
                 responseList.forEach(response -> sendMessage(new SendMessage(chatId, response)));
             }
@@ -68,7 +79,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private void sendMessage(SendMessage sendMessage) {
+    public void sendMessage(SendMessage sendMessage) {
         log.info("Send to chat {} message: {}", sendMessage.getChatId(), sendMessage.getText());
         try {
             execute(sendMessage);

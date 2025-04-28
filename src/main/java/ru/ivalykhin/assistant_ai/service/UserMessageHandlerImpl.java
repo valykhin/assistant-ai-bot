@@ -28,16 +28,14 @@ public class UserMessageHandlerImpl implements UserMessageHandler {
     private String DEFAULT_PROMPT;
 
     @Override
-    public List<String> sendMessageToAI(String message, Long userId) {
-        User user = userService.getUserById(userId)
-                .orElse(userService.createNewUser(userId));
+    public List<String> sendMessageToAI(String message, User user) {
 
         String prompt = getSuggestedPrompt(message);
 
         Response response =
                 openAIService.createResponse(
                         message,
-                        userId.toString(),
+                        user.getId().toString(),
                         user.getLastAIResponseId(),
                         prompt);
 

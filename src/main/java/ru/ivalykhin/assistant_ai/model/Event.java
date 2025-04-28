@@ -1,12 +1,13 @@
 package ru.ivalykhin.assistant_ai.model;
 
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 
 import java.time.OffsetDateTime;
 
@@ -42,6 +43,13 @@ public class Event {
     @Column(nullable = false)
     private String lastChangedBy;
 
-    @Column(nullable = false)
-    private String schedule;
+    @Type(JsonBinaryType.class)
+    @Column(columnDefinition = "jsonb", nullable = false)
+    private ScheduleConfig schedule;
+
+    @Column(name = "last_executed_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    private OffsetDateTime lastExecutedAt;
+
+    @Column(name = "next_execution_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    private OffsetDateTime nextExecutionAt;
 }

@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.ivalykhin.assistant_ai.bot.callback.CallbackData;
 import ru.ivalykhin.assistant_ai.bot.callback.CallbackHandler;
 import ru.ivalykhin.assistant_ai.bot.callback.CallbackType;
-import ru.ivalykhin.assistant_ai.bot.callback.TestCallback;
+import ru.ivalykhin.assistant_ai.bot.callback.EventUserMuteCallback;
 
 import java.util.Map;
 
@@ -17,8 +17,8 @@ public class CallbacksHandler {
     private final Map<CallbackType, CallbackHandler> callbacks;
     private final ObjectMapper objectMapper;
 
-    public CallbacksHandler(TestCallback testCallback, ObjectMapper objectMapper) {
-        this.callbacks = Map.of(CallbackType.TEST, testCallback
+    public CallbacksHandler(EventUserMuteCallback eventUserMuteCallback, ObjectMapper objectMapper) {
+        this.callbacks = Map.of(CallbackType.MUTE_EVENT_FOR_USER, eventUserMuteCallback
         );
         this.objectMapper = objectMapper;
     }
@@ -32,8 +32,8 @@ public class CallbacksHandler {
         if (callbackData == null) {
             answer = new SendMessage(String.valueOf(chatId), DefaultMessages.UNKNOWN_COMMAND);
         } else {
-            CallbackHandler callbackBiFunction = callbacks.get(callbackData.getType());
-            answer = callbackBiFunction.apply(callbackData, update);
+            CallbackHandler callbackFunction = callbacks.get(callbackData.getType());
+            answer = callbackFunction.apply(callbackData, update);
         }
 
         return answer;

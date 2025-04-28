@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   assistant-ai:
-    image: ghcr.io/valykhin/assistant-ai:0.0.1-SNAPSHOT
+    image: ghcr.io/valykhin/assistant-ai:0.0.2-SNAPSHOT
     container_name: assistant-ai
     restart: always
     ports:
@@ -17,7 +17,9 @@ services:
       BOT_TOKEN: ${BOT_TOKEN}
       DEFAULT_USERNAME: ${DEFAULT_USERNAME}
       DEFAULT_PASSWORD: ${DEFAULT_PASSWORD}
-      LOGGING_LEVEL_RU_IVALYKHIN_ASSISTANT_AI: INFO
+      SCHEDULER_CRON: ${SCHEDULER_CRON}
+      SPRING_APPLICATION_JSON: '{"logging":{"level":{"ru":{"ivalykhin":{"assistant_ai":"DEBUG"}}}}}'
+      LOGGING_LEVEL_RU_IVALYKHIN_ASSISTANT_AI: DEBUG
     depends_on:
       - postgres
 

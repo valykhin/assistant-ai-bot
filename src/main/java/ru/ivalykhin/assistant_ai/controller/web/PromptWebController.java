@@ -21,7 +21,6 @@ public class PromptWebController {
 
     @GetMapping
     public String listPrompts(Model model) {
-        log.info("Request");
         model.addAttribute("prompts", promptService.getAllPrompts());
         return "prompt/list";
     }

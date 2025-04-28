@@ -85,7 +85,7 @@ databaseChangeLog:
             constraints:
               nullable: false
             name: schedule
-            type: VARCHAR(255)
+            type: JSONB
         - column:
             constraints:
               nullable: false
@@ -200,5 +200,79 @@ databaseChangeLog:
         referencedColumnNames: id
         referencedTableName: prompts
         validate: true
+- changeSet:
+      id: 20250418-01-add-last-next-execution
+      author: ivalykhin
+      changes:
+          - addColumn:
+                tableName: events
+                columns:
+                    - column:
+                          name: last_executed_at
+                          type: TIMESTAMP WITH TIME ZONE
+                          constraints:
+                              nullable: true
+                    - column:
+                          name: next_execution_at
+                          type: TIMESTAMP WITH TIME ZONE
+                          constraints:
+                              nullable: true
+
+- changeSet:
+    id: 20250418-02-create-event-user-mute
+    author: ivalykhin
+    changes:
+        - createTable:
+              tableName: event_user_mutes
+              columns:
+                  - column:
+                        name: event_id
+                        type: BIGINT
+                        constraints:
+                            nullable: false
+                  - column:
+                        name: user_id
+                        type: BIGINT
+                        constraints:
+                            nullable: false
+                  - column:
+                        name: blocked_at
+                        type: TIMESTAMP WITH TIME ZONE
+                        constraints:
+                            nullable: false
+        - addPrimaryKey:
+              tableName: event_user_mutes
+              columnNames: event_id, user_id
+              constraintName: pk_event_user_mutes
+        - addForeignKeyConstraint:
+              constraintName: fk_event_user_mutes_event
+              baseTableName: event_user_mutes
+              baseColumnNames: event_id
+              referencedTableName: events
+              referencedColumnNames: id
+              onDelete: CASCADE
+- changeSet:
+    id: 20250418-04-alter-users-add-telegram-fields
+    author: ivalykhin
+    changes:
+      - addColumn:
+          tableName: users
+          columns:
+            - column:
+                name: username
+                type: VARCHAR(64)
+            - column:
+                name: first_name
+                type: VARCHAR(64)
+            - column:
+                name: last_name
+                type: VARCHAR(64)
+      - addForeignKeyConstraint:
+          constraintName: fk_event_user_mutes_user
+          baseTableName: event_user_mutes
+          baseColumnNames: user_id
+          referencedTableName: users
+          referencedColumnNames: id
+          onDelete: CASCADE
 
 

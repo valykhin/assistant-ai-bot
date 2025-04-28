@@ -2,44 +2,92 @@
 <html>
 <head th:replace="common/layout :: head"></head>
 <body>
-    <div th:replace="common/layout :: header"></div>
-    <div class="container mt-4">
-        <h2 th:text="${event.id} ? 'Редактирование Опроса' : 'Создание Опроса'"></h2>
-        <form th:action="${event.id} ? @{/events/update/{id}(id=${event.id})} : @{/events}" method="post" th:object="${event}">
-            <input type="hidden" th:field="*{id}">
+<div th:replace="common/layout :: header"></div>
+<div class="container mt-4">
+    <h2 th:text="${event.id} ? 'Редактирование Опроса' : 'Создание Опроса'"></h2>
+    <form th:action="${event.id} ? @{/events/update/{id}(id=${event.id})} : @{/events}" method="post" th:object="${event}">
+        <input type="hidden" th:field="*{id}">
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Название</label>
+            <input type="text" id="name" class="form-control" th:field="*{name}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="promptId" class="form-label">Промпт</label>
+            <select id="promptId" class="form-select" th:field="*{prompt.id}" required>
+                <option th:each="prompt : ${prompts}" th:value="${prompt.id}" th:text="${prompt.name}"></option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="content" class="form-label">Контент</label>
+            <textarea id="content" class="form-control" th:field="*{content}" required></textarea>
+        </div>
+
+        <!-- Блок ScheduleConfig -->
+        <fieldset class="border p-3 mb-4">
+            <legend class="float-none w-auto px-2">Расписание</legend>
 
             <div class="mb-3">
-                <label for="name" class="form-label">Название</label>
-                <input type="text" id="name" class="form-control" th:field="*{name}" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="promptId" class="form-label">Промпт</label>
-                <select id="promptId" class="form-select" th:field="*{prompt.name}" required>
-                    <option th:each="prompt : ${prompts}" th:value="${prompt.id}" th:text="${prompt.name}"></option>
+                <label for="schedule.periodicity" class="form-label">Периодичность</label>
+                <select id="schedule.periodicity" class="form-select" th:field="*{schedule.periodicity}">
+                    <option value="DAILY">Ежедневно</option>
+                    <option value="WEEKLY">Еженедельно</option>
+                    <option value="MONTHLY">Ежемесячно</option>
                 </select>
             </div>
 
             <div class="mb-3">
-                <label for="content" class="form-label">Контент</label>
-                <textarea id="content" class="form-control" th:field="*{content}" required></textarea>
+                <label for="schedule.time" class="form-label">Время</label>
+                <input type="time" id="schedule.time" class="form-control" required>
+                <input type="hidden" id="timeWithTimeZone" th:field="*{schedule.time}">
             </div>
 
             <div class="mb-3">
-                <label for="schedule" class="form-label">Расписание</label>
-                <input type="text" id="schedule" class="form-control" th:field="*{schedule}" required>
+                <label for="schedule.juniorUnits" class="form-label">Подчинённые единицы (через запятую)</label>
+                <input type="text" id="schedule.juniorUnits" class="form-control"
+                       th:value="${#strings.listJoin(event.schedule?.juniorUnits, ',')}" name="schedule.juniorUnits">
             </div>
 
             <div class="mb-3">
-                <label for="lastChangedBy" class="form-label">Автор изменений</label>
-                <input type="text" id="lastChangedBy" class="form-control" th:field="*{lastChangedBy}" required>
+                <label for="schedule.offset" class="form-label">Смещения (минуты, через запятую)</label>
+                <input type="text" id="schedule.offset" class="form-control"
+                       th:value="${#strings.listJoin(event.schedule?.offset, ',')}" name="schedule.offset">
             </div>
 
-            <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-success">Сохранить</button>
-                <a href="/events" class="btn btn-secondary">Отмена</a>
+            <div class="mb-3">
+                <label for="schedule.exceptDates" class="form-label">Исключения (даты через запятую)</label>
+                <input type="text" id="schedule.exceptDates" class="form-control"
+                       th:value="${#strings.listJoin(event.schedule?.exceptDates, ',')}" name="schedule.exceptDates">
             </div>
-        </form>
-    </div>
+        </fieldset>
+
+        <div class="mb-3">
+            <label for="lastChangedBy" class="form-label">Автор изменений</label>
+            <input type="text" id="lastChangedBy" class="form-control" th:field="*{lastChangedBy}" required>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-success">Сохранить</button>
+            <a href="/events" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+<script>
+    window.onload = function() {
+            const timeField = document.getElementById('schedule.time');
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const currentTime = `${hours}:${minutes}`;
+            timeField.value = timeField.value || currentTime;
+        };
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const timeField = document.getElementById('schedule.time');
+        const timeWithTimeZone = timeField.value !== "" ? timeField.value + "10:00:00+03:00" : "";
+        document.getElementById("timeWithTimeZone").value = timeWithTimeZone;
+    });
+</script>
 </body>
 </html>

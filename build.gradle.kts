@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "ru.ivalykhin"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.2-SNAPSHOT"
 description = "ai-assistant"
 
 val dockerImageName = "ghcr.io/valykhin/${rootProject.name}:${version}"
@@ -42,6 +42,7 @@ dependencies {
 	implementation("org.liquibase:liquibase-core:4.31.1")
 	implementation("org.telegram:telegrambots:6.9.7.1")
 	implementation("com.openai:openai-java:0.35.1")
+	implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.9.9")
 
 	compileOnly("org.projectlombok:lombok")
 
